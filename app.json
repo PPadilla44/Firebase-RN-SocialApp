@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "firebase-chat-nativc",
+    "slug": "firebase-chat-nativc",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  },
+  "name": "firebase-chat-nativc"
+}
