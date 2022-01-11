@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, StatusBar, LayoutAnimation } from "react-native";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 export default LoginScreen = (props) => {
+
 
     const { navigation } = props;
 
@@ -23,6 +24,17 @@ export default LoginScreen = (props) => {
 
     return (
         <View style={styles.contatiner} >
+            <StatusBar barStyle="light-content"></StatusBar>
+            <Image
+                source={require("../assets/authHeader.png")} 
+                style={styles.header}
+                >
+                </Image>
+            <Image
+                source={require("../assets/authHeader.png")} 
+                style={ styles.footer }
+                >
+                </Image>
             <Text style={styles.greeting}>{`Hello again.\nWelcome back.`}</Text>
 
             <View style={styles.errorMessage}>
@@ -71,6 +83,10 @@ export default LoginScreen = (props) => {
     )
 }
 
+LoginScreen.navigationOptions = props => ({
+    headerShown: false
+})
+
 const styles = StyleSheet.create({
     contatiner: {
         flex: 1,
@@ -116,5 +132,18 @@ const styles = StyleSheet.create({
         height: 52,
         alignItems: "center",
         justifyContent: "center"
+    },
+    header: {
+        width: 600, 
+        marginTop: -50, 
+        marginLeft: -150
+    },
+    footer: {
+        width: 600,
+        position: "absolute", 
+        bottom: -100, 
+        left: -100, 
+        opacity: .5,
+        transform: [{ rotate: "135deg" }]
     }
 })
