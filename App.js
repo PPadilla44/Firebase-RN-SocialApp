@@ -27,9 +27,56 @@ const firebaseConfig = {
 // Initialize Firebase
 initializeApp(firebaseConfig);
 
-const AppStack = createStackNavigator({
-  Home: HomeScreen
-})
+const AppTabNavigator = createBottomTabNavigator(
+  {
+    Home: {
+      screen: HomeScreen,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => <Ionicons name="ios-home" size={24} color={tintColor} />
+      }
+    },
+    Message: {
+      screen: MessageScreen,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => <Ionicons name="ios-chatbubble" size={24} color={tintColor} />
+      }
+    },
+    Post: {
+      screen: PostScreen,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => <Ionicons
+          name="ios-add-circle"
+          size={48} 
+          color="#E9446A" 
+          style={{
+            shadowColor: "#E9446A", 
+            shadowOffset: { width: 0, height: 0}, 
+            shadowRadius: 10, 
+            shadowOpacity: 0.3 
+          }} />
+      }
+    },
+    Notification: {
+      screen: NotificationScreen,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => <Ionicons name="ios-notifications" size={24} color={tintColor} />
+      }
+    },
+    Profile: {
+      screen: ProfileScreen,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => <Ionicons name="ios-person" size={24} color={tintColor} />
+      }
+    },
+  },
+  {
+    tabBarOptions: {
+      activeTintColor: "#161F3D",
+      inactiveTintColor: "#B8BBC4",
+      showLabel: false
+    }
+  }
+)
 
 const AuthStack = createStackNavigator({
   Login: LoginScreen,
@@ -41,7 +88,7 @@ export default createAppContainer(
   createSwitchNavigator(
     {
       Loading: LoadingScreen,
-      App: AppStack,
+      App: AppTabNavigator,
       Auth: AuthStack
     },
     {
