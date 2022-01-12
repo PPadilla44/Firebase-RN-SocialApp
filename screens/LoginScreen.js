@@ -22,6 +22,8 @@ export default LoginScreen = (props) => {
 
     }
 
+    LayoutAnimation.easeInEaseOut();
+
     return (
         <View style={styles.contatiner} >
             <StatusBar barStyle="light-content"></StatusBar>

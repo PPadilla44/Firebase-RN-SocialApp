@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, LayoutAnimation } from "react-native";
 import { getAuth, signOut } from "firebase/auth";
 
 export default HomeScreen = (props) => {
@@ -18,6 +18,8 @@ export default HomeScreen = (props) => {
         const auth = getAuth();
         await signOut(auth);
     }
+
+    LayoutAnimation.easeInEaseOut();
 
     return (
         <View style={styles.contatiner} >
