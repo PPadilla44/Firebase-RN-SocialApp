@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image, TextInput } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import Constants from "expo-constants";
-import { requestCameraPermissionsAsync } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import Fire from "../Fire";
 import UserPermissions from "../utilities/UserPermissions";

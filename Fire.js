@@ -1,8 +1,9 @@
 import { FireBaseKeys } from "./config";
 import { initializeApp } from "firebase/app";
 import { collection, getFirestore, addDoc, setDoc, doc } from "firebase/firestore";
-import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import { createUserWithEmailAndPassword, getAuth, signOut } from "firebase/auth";
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
+import { getDatabase } from "firebase/database";
 
 class Fire {
     constructor() {
@@ -100,6 +101,10 @@ class Fire {
 
     }
 
+    signOut = () => {
+        signOut(getAuth());
+    }
+
     get firestore() {
         return getFirestore();
     }
@@ -112,6 +117,7 @@ class Fire {
     get timestamp() {
         return Date.now();
     }
+
 }
 
 Fire.shared = new Fire();

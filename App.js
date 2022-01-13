@@ -80,7 +80,7 @@ const AppContainer = createStackNavigator(
 					activeTintColor: "#161F3D",
 					inactiveTintColor: "#B8BBC4",
 					showLabel: false
-				}
+				},
 			}
 		),
 		postModal: {
@@ -97,8 +97,6 @@ const AppContainer = createStackNavigator(
 const AuthStack = createStackNavigator({
 	Login: LoginScreen,
 	Register: RegisterScreen,
-},{
-	initialRouteName: "Register"
 })
 
 
