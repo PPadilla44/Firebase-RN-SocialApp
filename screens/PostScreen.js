@@ -25,17 +25,16 @@ export default PostScreen = (props) => {
         }
     }
 
-    const handlePost = () => {
-        Fire.shared.addPost({text: text.trim(), localUri: image})
-            .then(ref => {
-                setText("")
-                setImage(null)
-                navigation.goBack();
-            })
-            .catch(err => {
-                console.log(err);
-                alert(err)
-            })
+    const handlePost = async () => {
+        try {
+            const tester = await Fire.shared.addPost({text: text.trim(), localUri: image})
+            setText("")
+            setImage(null)
+            navigation.goBack();
+        } catch (err) {
+            console.log("error");
+            alert(err)
+        }
     }
 
     const pickImage = async () => {

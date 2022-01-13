@@ -1,9 +1,8 @@
 import { FireBaseKeys } from "./config";
 import { initializeApp } from "firebase/app";
-import { collection, getFirestore } from "firebase/firestore";
+import { collection, getFirestore, addDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
-
 
 class Fire {
     constructor() {
@@ -12,27 +11,28 @@ class Fire {
 
     addPost = async ({ text, localUri }) => {
         const remoteUri = await this.uploadPhotoAsync(localUri);
+        
+        return new Promise( async (res, rej) => {
+            try {
+                const ref = await addDoc(collection(this.firestore, "posts"), {
+                    text,
+                    uri: this.uid,
+                    timestamp: this.timestamp,
+                    image: remoteUri
+                });
+                return res(ref)
+            } catch (err) {
+                return rej(err)
+            }
 
-        return new Promise((res, req) => {
-            collection("posts").add({
-                text,
-                uri: this.uid,
-                timestamp: this.timestamp,
-                image: remoteUri
-            })
-            .then(ref => {
-                res(ref)
-            })
-            .catch(error => {
-                req(error)
-            })
+            
         })
     }
 
     uploadPhotoAsync = async uri => {
         const path = `photos/${this.uid}/${Date.now()}.jpg`;
 
-        return new Promise(async (res, req) => {
+        return new Promise(async (res, rej) => {
             const response = await fetch(uri);
             const file = await response.blob();
 
@@ -56,17 +56,17 @@ class Fire {
                     }
                 },
                 (error) => {
-                    req(error);
-                    // Handle unsuccessful uploads
+                    rej(error);
                 }, 
-                () => {
-                    getDownloadURL(uploadTask.snapshot.ref)
-                        .then((downloadUrl) => {
-                            console.log("available at", downloadUrl);
-                            res(downloadUrl)
-                        }) .catch(err => {
-                            console.log("BEO", err)
-                        })
+                async () => {
+                    try {
+                        const url = await getDownloadURL(uploadTask.snapshot.ref)
+                        console.log("Available at", url);
+                        res(url)
+                    } catch (err) {
+                        rej(err)
+                    }
+
                 }
             )
         })
