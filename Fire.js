@@ -1,7 +1,7 @@
 import { FireBaseKeys } from "./config";
 import { initializeApp } from "firebase/app";
-import { collection, getFirestore, addDoc } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { collection, getFirestore, addDoc, setDoc, doc } from "firebase/firestore";
+import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
 
 class Fire {
@@ -10,7 +10,7 @@ class Fire {
     }
 
     addPost = async ({ text, localUri }) => {
-        const remoteUri = await this.uploadPhotoAsync(localUri);
+        const remoteUri = await this.uploadPhotoAsync(localUri, `photos/${this.uid}/${Date.now()}`);
         
         return new Promise( async (res, rej) => {
             try {
@@ -29,8 +29,8 @@ class Fire {
         })
     }
 
-    uploadPhotoAsync = async uri => {
-        const path = `photos/${this.uid}/${Date.now()}.jpg`;
+    uploadPhotoAsync = async (uri, filename) => {
+        // const path = `photos/${this.uid}/${Date.now()}.jpg`;
 
         return new Promise(async (res, rej) => {
             const response = await fetch(uri);
@@ -38,7 +38,7 @@ class Fire {
 
 
             const storage = getStorage();
-            const storageRef = ref(storage, path);
+            const storageRef = ref(storage, filename);
 
             const uploadTask = uploadBytesResumable(storageRef, file);
 
@@ -70,6 +70,34 @@ class Fire {
                 }
             )
         })
+    }
+
+    createUser = async user => {
+        let remoteUri = null;
+
+        try {
+            const {email, avatar, password, name} = user;
+
+            const auth = getAuth();
+            await createUserWithEmailAndPassword(auth, email, password);
+            const ref = doc(this.firestore, "users", this.uid);
+
+            await setDoc(ref, {
+                name,
+                email,
+                avatar: null,
+            });
+
+            if(avatar) {
+                remoteUri = await this.uploadPhotoAsync(user.avatar, `avatars/${this.uid}`)
+
+                setDoc(ref, { avatar: remoteUri}, {merge: true})
+            }
+
+        } catch (err) {
+            alert("Error: ", err.message)
+        }
+
     }
 
     get firestore() {

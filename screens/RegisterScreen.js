@@ -1,12 +1,18 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, StatusBar } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import Fire from "../Fire";
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import UserPermissions from "../utilities/UserPermissions";
+import * as ImagePicker from "expo-image-picker";
+
 
 export default RegisterScreen = (props) => {
 
     const { navigation } = props;
 
+
+    const [avatar, setAvatar] = useState(null)
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -14,16 +20,24 @@ export default RegisterScreen = (props) => {
 
     const handleSignUp = async () => {
 
-        try {
+        let userData = {name, email, password, avatar}
 
-            const auth = getAuth();
-            const userCredentials = await createUserWithEmailAndPassword(auth, email, password);
-            updateProfile(userCredentials.user, {
-                displayName: name
-            })
+        Fire.shared.createUser(userData);
 
-        } catch (err) {
-            setErrorMessage(err.message)
+    }
+
+    const handlePickAvatar = async () => {
+        console.log("Pressed");
+        UserPermissions.getCameraPermission();
+
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3]
+        })
+
+        if (!result.cancelled) {
+            setAvatar(result.uri);
         }
     }
 
@@ -32,15 +46,15 @@ export default RegisterScreen = (props) => {
             <StatusBar barStyle="light-content"></StatusBar>
 
             <Image
-                source={require("../assets/authHeader.png")} 
+                source={require("../assets/authHeader.png")}
                 style={styles.header}
-                >
-                </Image>
+            >
+            </Image>
             <Image
-                source={require("../assets/authHeader.png")} 
-                style={ styles.footer }
-                >
-                </Image>
+                source={require("../assets/authHeader.png")}
+                style={styles.footer}
+            >
+            </Image>
 
             <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
                 <Ionicons name="arrow-back" size={32} color={"#FFF"}></Ionicons>
@@ -48,8 +62,9 @@ export default RegisterScreen = (props) => {
 
             <View style={{ position: "absolute", top: 64, alignItems: "center", width: "100%" }}>
                 <Text style={styles.greeting}>{`Hello!\nSign up to get started`}</Text>
-                <TouchableOpacity style={styles.avatar}>
-                    <Ionicons name="add" size={40} color={"#FFF"} style={{ marginTop: 6, marginLeft: 2 }}></Ionicons>
+                <TouchableOpacity style={styles.avatarPlaceholder} onPress={handlePickAvatar} >
+                    <Image source={{ uri: avatar }} style={styles.avatar} />
+                    <Ionicons name="add" size={40} color={"#FFF"} style={{ marginTop: 6, marginLeft: 2 }} />
                 </TouchableOpacity>
             </View>
 
@@ -60,24 +75,24 @@ export default RegisterScreen = (props) => {
             <View style={styles.form}>
                 <View>
                     <Text style={styles.inputTitle}>Full Name</Text>
-                    <TextInput 
+                    <TextInput
                         style={styles.input}
                         autoCapitalize="none"
                         onChangeText={name => setName(name)}
                         value={name}
-                        >
-                        </TextInput>
+                    >
+                    </TextInput>
                 </View>
 
                 <View style={{ marginTop: 32 }}>
                     <Text style={styles.inputTitle}>Email Address</Text>
-                    <TextInput 
+                    <TextInput
                         style={styles.input}
                         autoCapitalize="none"
                         onChangeText={email => setEmail(email)}
                         value={email}
-                        >
-                        </TextInput>
+                    >
+                    </TextInput>
                 </View>
 
                 <View style={{ marginTop: 32 }}>
@@ -88,19 +103,19 @@ export default RegisterScreen = (props) => {
                         autoCapitalize="none"
                         onChangeText={password => setPassword(password)}
                         value={password}
-                        >
-                        </TextInput>
+                    >
+                    </TextInput>
                 </View>
             </View>
-        
+
             <TouchableOpacity style={styles.button} onPress={handleSignUp} >
                 <Text style={{ color: "#FFF", fontWeight: "500" }} >Sign up</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity 
+            <TouchableOpacity
                 style={{ alignSelf: "center", marginTop: 32 }}
                 onPress={() => navigation.navigate("Login")}
-                >
+            >
                 <Text style={{ color: "#414959", fontSize: 13 }}>
                     Not new to SocialApp? <Text style={{ fontWeight: "500", color: "#E9446A" }}>Login</Text>
                 </Text>
@@ -122,7 +137,7 @@ const styles = StyleSheet.create({
         marginTop: 32,
         fontSize: 18,
         fontWeight: "400",
-        textAlign: "center"
+        textAlign: "center",
     },
     errorMessage: {
         height: 72,
@@ -161,15 +176,15 @@ const styles = StyleSheet.create({
         justifyContent: "center"
     },
     header: {
-        width: 600, 
-        marginTop: -50, 
+        width: 600,
+        marginTop: -50,
         marginLeft: -150
     },
     footer: {
         width: 600,
-        position: "absolute", 
-        bottom: -100, 
-        left: -100, 
+        position: "absolute",
+        bottom: -100,
+        left: -100,
         opacity: .5,
         transform: [{ rotate: "135deg" }]
     },
@@ -184,13 +199,19 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
     },
+    avatarPlaceholder: {
+        width: 100,
+        height: 100,
+        backgroundColor: "#E1E2E6",
+        borderRadius: 50,
+        marginTop: 48,
+        justifyContent: "center",
+        alignItems: "center",
+    },
     avatar: {
+        position: "absolute",
         width: 100,
         height: 100,
         borderRadius: 50,
-        backgroundColor: "#E1E2E6",
-        marginTop: 48,
-        justifyContent: "center",
-        alignItems: "center"
     }
 })

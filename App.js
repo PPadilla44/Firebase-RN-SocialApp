@@ -97,6 +97,8 @@ const AppContainer = createStackNavigator(
 const AuthStack = createStackNavigator({
 	Login: LoginScreen,
 	Register: RegisterScreen,
+},{
+	initialRouteName: "Register"
 })
 
 

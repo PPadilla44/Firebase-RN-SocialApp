@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image, TextInput } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Constants from "expo-constants";
-import * as Permissions from "expo-permissions";
 import { requestCameraPermissionsAsync } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import Fire from "../Fire";
+import UserPermissions from "../utilities/UserPermissions";
 
 export default PostScreen = (props) => {
 
@@ -14,20 +14,9 @@ export default PostScreen = (props) => {
     const [text, setText] = useState("");
     const [image, setImage] = useState(null);
 
-    const getPhotoPermission = async () => {
-        if (Constants.platform.ios) {
-            const { status } = await requestCameraPermissionsAsync()
-
-            if (status !== "granted") {
-                alert("We need permission to access your camera roll");
-            }
-
-        }
-    }
-
     const handlePost = async () => {
         try {
-            const tester = await Fire.shared.addPost({text: text.trim(), localUri: image})
+            const post = await Fire.shared.addPost({text: text.trim(), localUri: image})
             setText("")
             setImage(null)
             navigation.goBack();
@@ -50,7 +39,7 @@ export default PostScreen = (props) => {
     }
 
     useEffect(() => {
-        getPhotoPermission();
+        UserPermissions.getCameraPermission();
     },[])
 
     return (
