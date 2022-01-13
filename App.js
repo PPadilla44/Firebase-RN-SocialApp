@@ -9,6 +9,7 @@ import RegisterScreen from "./screens/RegisterScreen";
 
 import HomeScreen from "./screens/HomeScreen";
 import MessageScreen from "./screens/MessageScreen";
+import UsersScreen from "./screens/UsersScreen";
 import NotificationScreen from "./screens/NotificationScreen";
 import PostScreen from "./screens/PostScreen";
 import ProfileScreen from "./screens/ProfileScreen";
@@ -32,8 +33,8 @@ const AppContainer = createStackNavigator(
 						tabBarIcon: ({ tintColor }) => <Ionicons name="ios-home" size={24} color={tintColor} />
 					}
 				},
-				Message: {
-					screen: MessageScreen,
+				Users: {
+					screen: UsersScreen,
 					navigationOptions: {
 						tabBarIcon: ({ tintColor }) => <Ionicons name="ios-chatbubble" size={24} color={tintColor} />
 					}
@@ -81,6 +82,7 @@ const AppContainer = createStackNavigator(
 					inactiveTintColor: "#B8BBC4",
 					showLabel: false
 				},
+				initialRouteName: "Users"
 			}
 		),
 		postModal: {
