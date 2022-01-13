@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, StatusBar, LayoutAnimation } from "react-native";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+
 
 export default LoginScreen = (props) => {
 
@@ -25,7 +27,7 @@ export default LoginScreen = (props) => {
     LayoutAnimation.easeInEaseOut();
 
     return (
-        <View style={styles.contatiner} >
+        <KeyboardAwareScrollView style={styles.contatiner} >
             <StatusBar barStyle="light-content"></StatusBar>
             <Image
                 source={require("../assets/authHeader.png")} 
@@ -81,7 +83,7 @@ export default LoginScreen = (props) => {
                 </Text>
             </TouchableOpacity>
 
-        </View>
+        </KeyboardAwareScrollView>
     )
 }
 
@@ -143,9 +145,9 @@ const styles = StyleSheet.create({
     footer: {
         width: 600,
         position: "absolute", 
-        bottom: -100, 
+        bottom: -350, 
         left: -100, 
         opacity: .5,
-        transform: [{ rotate: "135deg" }]
+        transform: [{ rotate: "180deg" }]
     }
 })

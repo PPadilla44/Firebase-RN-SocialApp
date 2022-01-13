@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, StatusBar } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Ionicons } from "@expo/vector-icons";
 import Fire from "../Fire";
-import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import UserPermissions from "../utilities/UserPermissions";
 import * as ImagePicker from "expo-image-picker";
 
@@ -20,7 +20,7 @@ export default RegisterScreen = (props) => {
 
     const handleSignUp = async () => {
 
-        let userData = {name, email, password, avatar}
+        let userData = { name, email, password, avatar }
 
         Fire.shared.createUser(userData);
 
@@ -42,7 +42,9 @@ export default RegisterScreen = (props) => {
     }
 
     return (
-        <View style={styles.contatiner} >
+
+        <KeyboardAwareScrollView style={styles.contatiner} >
+
             <StatusBar barStyle="light-content"></StatusBar>
 
             <Image
@@ -121,7 +123,8 @@ export default RegisterScreen = (props) => {
                 </Text>
             </TouchableOpacity>
 
-        </View>
+        </KeyboardAwareScrollView>
+
     )
 }
 
@@ -183,10 +186,10 @@ const styles = StyleSheet.create({
     footer: {
         width: 600,
         position: "absolute",
-        bottom: -100,
+        bottom: -350,
         left: -100,
         opacity: .5,
-        transform: [{ rotate: "135deg" }]
+        transform: [{ rotate: "180deg" }]
     },
     back: {
         position: "absolute",
