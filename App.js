@@ -34,7 +34,12 @@ const AppContainer = createStackNavigator(
 					}
 				},
 				Users: {
-					screen: UsersScreen,
+					screen: createStackNavigator({
+						User: {screen: UsersScreen},
+						Message: { screen: MessageScreen}
+					},{
+						headerMode: "none"
+					}),
 					navigationOptions: {
 						tabBarIcon: ({ tintColor }) => <Ionicons name="ios-chatbubble" size={24} color={tintColor} />
 					}

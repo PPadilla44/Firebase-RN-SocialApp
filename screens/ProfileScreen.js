@@ -9,13 +9,19 @@ import { Ionicons } from "@expo/vector-icons";
 
 export default ProfileScreen = (props) => {
 
+    const { navigation } = props;
     const [user, setUser] = useState({});
 
     useEffect(() => {
+
         const user = props.uid || Fire.shared.uid;
 
         const unsub = onSnapshot(doc(Fire.shared.firestore, "users", user), (doc) => {
             console.log("Current data: ", doc.data());
+            if(doc.data() === undefined) {
+                navigation.navigate("Login")
+                Fire.shared.signOut()
+            }
             setUser(doc.data())
         });
 

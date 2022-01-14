@@ -80,10 +80,11 @@ class Fire {
             const {email, avatar, password, name} = user;
 
             const auth = getAuth();
-            await createUserWithEmailAndPassword(auth, email, password);
+            const createdUser = await createUserWithEmailAndPassword(auth, email, password);
             const ref = doc(this.firestore, "users", this.uid);
 
             await setDoc(ref, {
+                id: createdUser.user.uid,
                 name,
                 email,
                 avatar: null,

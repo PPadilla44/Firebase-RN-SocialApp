@@ -5,12 +5,14 @@ import { getDatabase, ref, child, push, set, get, onValue } from "firebase/datab
 import { Ionicons } from "@expo/vector-icons";
 
 import Fire from "../Fire";
-import { FlatList } from "react-native-gesture-handler";
+import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
+import { getAuth } from "firebase/auth";
 
-export default UsersScreen = (props) => {
+export default UsersScreen = ({ navigation }) => {
 
     const [userList, setUserList] = useState([])
     const db = Fire.shared.firestore;
+    const auth = getAuth();
 
     useEffect(() => {
         const docRef = collection(db, "users");
@@ -18,8 +20,10 @@ export default UsersScreen = (props) => {
             (snap) => {
                 let newUsers = [];
                 snap.forEach((doc) => {
-                    console.log(doc.data());
-                    newUsers.push(doc.data());
+                    const otherUser = doc.data();
+                    if(auth.currentUser.uid !== otherUser.id){
+                        newUsers.push(otherUser);
+                    }
                 })
                 setUserList(newUsers)
             },
@@ -30,10 +34,15 @@ export default UsersScreen = (props) => {
         return () => unsub();
     }, []);
 
+    const hanldeSelectUser = (user) => {
+        navigation.navigate("Message", {
+            otherUser: user,
+        })
+    }
+
     const renderUser = (user) => {
-        console.log(user);
         return (
-            <View style={styles.userContainer}>
+            <TouchableOpacity style={styles.userContainer} onPress={() => hanldeSelectUser(user)}>
                 <View style={styles.avatarContainer}>
                     {
                         user.avatar ?
@@ -43,7 +52,7 @@ export default UsersScreen = (props) => {
                     }
                 </View>
                 <Text style={styles.name}>{user.name}</Text>
-            </View>
+            </TouchableOpacity>
         )
     }
 
