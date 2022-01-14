@@ -86,7 +86,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 32,
         paddingVertical: 12,
         borderBottomWidth: 1,
-        borderBottomColor: "#D8D9DB"
+        borderBottomColor: "#D8D9DB",
+        alignItems: "center"
     },
     inputContainer: {
         margin: 32,

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, StyleSheet, Button, Image } from "react-native";
-import { doc, onSnapshot, collection, getDoc, getDocs } from "firebase/firestore";
-import { getDatabase, ref, child, push, set, get, onValue } from "firebase/database";
+import { Text, View, StyleSheet, Image } from "react-native";
+import { onSnapshot, collection, getDocs, query, where } from "firebase/firestore";
 import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 
 import Fire from "../Fire";
 import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
@@ -10,28 +11,39 @@ import { getAuth } from "firebase/auth";
 
 export default UsersScreen = ({ navigation }) => {
 
-    const [userList, setUserList] = useState([])
+    const [chatList, setChatList] = useState([])
     const db = Fire.shared.firestore;
     const auth = getAuth();
 
-    useEffect(() => {
-        const docRef = collection(db, "users");
-        const unsub = onSnapshot(docRef,
-            (snap) => {
-                let newUsers = [];
-                snap.forEach((doc) => {
-                    const otherUser = doc.data();
-                    if(auth.currentUser.uid !== otherUser.id){
-                        newUsers.push(otherUser);
-                    }
-                })
-                setUserList(newUsers)
-            },
-            (err) => {
-                console.log(err);
-            })
+    useEffect(async () => {
+        const docRef = collection(db, "chats");
+        const q = query(docRef, where('users', 'array-contains', [auth.currentUser.uid]));
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.docs.length > 0) {
 
-        return () => unsub();
+            const unsub = onSnapshot(q,
+                (snap) => {
+                    let newChats = [];
+                    snap.forEach((doc) => {
+                        const oneChat = doc.data();
+                        console.log(oneChat.id);
+                        if (auth.currentUser.uid !== oneChat.id) {
+                            newChats.push(oneChat);
+                        }
+                    })
+                    setChatList(newUsers)
+                },
+                (err) => {
+                    console.log(err);
+                })
+
+            return () => unsub();
+
+        } else {
+            console.log("No chats");
+        }
+
+
     }, []);
 
     const hanldeSelectUser = (user) => {
@@ -58,53 +70,54 @@ export default UsersScreen = ({ navigation }) => {
 
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.headerTitle}>Users</Text>
+                <TouchableOpacity >
+                    <Ionicons name="search" size={24} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate("NewChat")} >
+                    <Ionicons name="create" size={24} />
+                </TouchableOpacity>
             </View>
-            <FlatList 
+            <FlatList
                 style={styles.feed}
-                data={userList}
-                renderItem={({item}) => renderUser(item)}
-                keyExtractor={user => user.id}
+                data={chatList}
+                renderItem={({ item }) => renderUser(item)}
+                keyExtractor={item => item.rid}
                 showsVerticalScrollIndicator={false}
             />
-        </View>
+        </SafeAreaView>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-    }, 
+    },
     header: {
-        paddingTop: 64,
-        paddingBottom: 16,
-        backgroundColor: "#FFF",
-        alignItems: "center",
-        justifyContent: "center",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        paddingHorizontal: 32,
+        paddingVertical: 12,
         borderBottomWidth: 1,
-        borderBottomColor: "#EBECF4",
-        shadowColor: "#454D65",
-        shadowOffset: { height: 5 },
-        shadowRadius: 15,
-        shadowOpacity: 0.2,
-        zIndex: 10
+        borderBottomColor: "#D8D9DB",
     },
     headerTitle: {
         fontSize: 20,
-        fontWeight: "500"
+        fontWeight: "500",
+        textAlign: "center",
     },
     feed: {
         marginHorizontal: 16
     },
-    userContainer : {
+    userContainer: {
         backgroundColor: "#FFF",
         borderRadius: 5,
         padding: 8,
         flexDirection: "row",
         marginVertical: 8,
-        paddingHorizontal: 16
+        paddingHorizontal: 16,
+        alignItems: "center"
     },
     avatarContainer: {
         shadowColor: "#151734",
@@ -114,7 +127,8 @@ const styles = StyleSheet.create({
     avatar: {
         width: 40,
         height: 40,
-        borderRadius: 68
+        borderRadius: 68,
+        marginRight: 10
     },
     name: {
         fontSize: 16,

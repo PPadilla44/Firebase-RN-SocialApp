@@ -17,6 +17,7 @@ import ProfileScreen from "./screens/ProfileScreen";
 import { initializeApp } from "firebase/app";
 
 import { FireBaseKeys } from "./config";
+import NewChat from "./screens/NewChat";
 
 const firebaseConfig = FireBaseKeys
 
@@ -35,8 +36,9 @@ const AppContainer = createStackNavigator(
 				},
 				Users: {
 					screen: createStackNavigator({
+						NewChat: { screen : NewChat },
 						User: {screen: UsersScreen},
-						Message: { screen: MessageScreen}
+						Message: { screen: MessageScreen},
 					},{
 						headerMode: "none"
 					}),

@@ -78,13 +78,14 @@ class Fire {
 
         try {
             const {email, avatar, password, name} = user;
+            console.log(user);
 
             const auth = getAuth();
             const createdUser = await createUserWithEmailAndPassword(auth, email, password);
             const ref = doc(this.firestore, "users", this.uid);
 
             await setDoc(ref, {
-                id: createdUser.user.uid,
+                _id: createdUser.user.uid,
                 name,
                 email,
                 avatar: null,
@@ -97,7 +98,7 @@ class Fire {
             }
 
         } catch (err) {
-            alert("Error: ", err.message)
+            alert("Error: ", err)
         }
 
     }
