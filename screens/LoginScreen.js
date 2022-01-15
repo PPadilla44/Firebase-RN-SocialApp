@@ -12,11 +12,11 @@ export default LoginScreen = (props) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState(null);
+    const auth = getAuth();
 
     const handleLogin = async () => {
         
         try {
-            const auth = getAuth();
             await signInWithEmailAndPassword(auth, email, password)
         } catch (err) {
             setErrorMessage(err.message)
@@ -28,17 +28,16 @@ export default LoginScreen = (props) => {
 
     return (
         <KeyboardAwareScrollView style={styles.contatiner} >
-            <StatusBar barStyle="light-content"></StatusBar>
+            <StatusBar barStyle="light-content" />
             <Image
                 source={require("../assets/authHeader.png")} 
                 style={styles.header}
-                >
-                </Image>
+                />
             <Image
                 source={require("../assets/authHeader.png")} 
                 style={ styles.footer }
-                >
-                </Image>
+                />
+
             <Text style={styles.greeting}>{`Hello again.\nWelcome back.`}</Text>
 
             <View style={styles.errorMessage}>
@@ -53,8 +52,7 @@ export default LoginScreen = (props) => {
                         autoCapitalize="none"
                         onChangeText={email => setEmail(email)}
                         value={email}
-                        >
-                        </TextInput>
+                        />
                 </View>
 
                 <View style={{ marginTop: 32 }}>
@@ -65,8 +63,7 @@ export default LoginScreen = (props) => {
                         autoCapitalize="none"
                         onChangeText={password => setPassword(password)}
                         value={password}
-                        >
-                        </TextInput>
+                        />
                 </View>
             </View>
         
@@ -86,10 +83,6 @@ export default LoginScreen = (props) => {
         </KeyboardAwareScrollView>
     )
 }
-
-LoginScreen.navigationOptions = props => ({
-    headerShown: false
-})
 
 const styles = StyleSheet.create({
     contatiner: {

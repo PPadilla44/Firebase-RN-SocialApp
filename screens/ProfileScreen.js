@@ -1,9 +1,7 @@
-import { getAuth, signOut } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Button, Image } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import Fire from "../Fire";
-import { doc, onSnapshot, collection } from "firebase/firestore";
+import { doc, onSnapshot, getFirestore } from "firebase/firestore";
 import { Ionicons } from "@expo/vector-icons";
 
 
@@ -11,13 +9,13 @@ export default ProfileScreen = (props) => {
 
     const { navigation } = props;
     const [user, setUser] = useState({});
+    const firestore = getFirestore();
 
     useEffect(() => {
 
         const user = props.uid || Fire.shared.uid;
 
-        const unsub = onSnapshot(doc(Fire.shared.firestore, "users", user), (doc) => {
-            console.log("Current data: ", doc.data());
+        const unsub = onSnapshot(doc(firestore, "users", user), (doc) => {
             if(doc.data() === undefined) {
                 navigation.navigate("Login")
                 Fire.shared.signOut()

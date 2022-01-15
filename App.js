@@ -36,8 +36,8 @@ const AppContainer = createStackNavigator(
 				},
 				Users: {
 					screen: createStackNavigator({
-						NewChat: { screen : NewChat },
 						User: {screen: UsersScreen},
+						NewChat: { screen : NewChat },
 						Message: { screen: MessageScreen},
 					},{
 						headerMode: "none"
@@ -104,9 +104,12 @@ const AppContainer = createStackNavigator(
 
 
 const AuthStack = createStackNavigator({
-	Login: LoginScreen,
-	Register: RegisterScreen,
-})
+	Login: {screen : LoginScreen},
+	Register: {screen: RegisterScreen},
+},{
+	headerMode: "none"
+}
+)
 
 
 export default createAppContainer(

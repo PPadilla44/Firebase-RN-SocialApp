@@ -14,7 +14,7 @@ export default PostScreen = (props) => {
 
     const handlePost = async () => {
         try {
-            const post = await Fire.shared.addPost({text: text.trim(), localUri: image})
+            await Fire.shared.addPost({text: text.trim(), localUri: image})
             setText("")
             setImage(null)
             navigation.goBack();
@@ -61,8 +61,7 @@ export default PostScreen = (props) => {
                     placeholder="Want to share something?"
                     onChangeText={text => setText(text)}
                     value={text}
-                >
-                </TextInput>
+                />
             </View>
 
             <TouchableOpacity style={styles.photo} onPress={pickImage} >

@@ -27,7 +27,6 @@ export default RegisterScreen = (props) => {
     }
 
     const handlePickAvatar = async () => {
-        console.log("Pressed");
         UserPermissions.getCameraPermission();
 
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -50,13 +49,11 @@ export default RegisterScreen = (props) => {
             <Image
                 source={require("../assets/authHeader.png")}
                 style={styles.header}
-            >
-            </Image>
+            />
             <Image
                 source={require("../assets/authHeader.png")}
                 style={styles.footer}
-            >
-            </Image>
+            />
 
             <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
                 <Ionicons name="arrow-back" size={32} color={"#FFF"}></Ionicons>
@@ -82,8 +79,7 @@ export default RegisterScreen = (props) => {
                         autoCapitalize="none"
                         onChangeText={name => setName(name)}
                         value={name}
-                    >
-                    </TextInput>
+                    />
                 </View>
 
                 <View style={{ marginTop: 32 }}>
@@ -93,8 +89,7 @@ export default RegisterScreen = (props) => {
                         autoCapitalize="none"
                         onChangeText={email => setEmail(email)}
                         value={email}
-                    >
-                    </TextInput>
+                    />
                 </View>
 
                 <View style={{ marginTop: 32 }}>
@@ -105,8 +100,7 @@ export default RegisterScreen = (props) => {
                         autoCapitalize="none"
                         onChangeText={password => setPassword(password)}
                         value={password}
-                    >
-                    </TextInput>
+                    />
                 </View>
             </View>
 
@@ -127,10 +121,6 @@ export default RegisterScreen = (props) => {
 
     )
 }
-
-RegisterScreen.navigationOptions = props => ({
-    headerShown: false
-})
 
 const styles = StyleSheet.create({
     contatiner: {

@@ -1,37 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, Image } from "react-native";
-import { onSnapshot, collection, getDocs, query, where } from "firebase/firestore";
+import { onSnapshot, collection, getDocs, query, where, getFirestore, getDoc, doc } from "firebase/firestore";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-
-import Fire from "../Fire";
 import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
 import { getAuth } from "firebase/auth";
 
 export default UsersScreen = ({ navigation }) => {
 
     const [chatList, setChatList] = useState([])
-    const db = Fire.shared.firestore;
+    const firestore = getFirestore();
     const auth = getAuth();
 
     useEffect(async () => {
-        const docRef = collection(db, "chats");
-        const q = query(docRef, where('users', 'array-contains', [auth.currentUser.uid]));
+        const docRef = collection(firestore, "chats");
+        const q = query(docRef, where('users', 'array-contains-any', [auth.currentUser.uid]));
         const querySnapshot = await getDocs(q);
         if (querySnapshot.docs.length > 0) {
 
             const unsub = onSnapshot(q,
                 (snap) => {
                     let newChats = [];
-                    snap.forEach((doc) => {
-                        const oneChat = doc.data();
-                        console.log(oneChat.id);
-                        if (auth.currentUser.uid !== oneChat.id) {
-                            newChats.push(oneChat);
-                        }
+                    snap.forEach(async (chatDoc) => {
+                        const oneChat = chatDoc.data();
+                        newChats.push(oneChat);
                     })
-                    setChatList(newUsers)
+                    handleChats(newChats)
                 },
                 (err) => {
                     console.log(err);
@@ -46,24 +41,39 @@ export default UsersScreen = ({ navigation }) => {
 
     }, []);
 
+    const handleChats = async (newChats) => {
+        const newUsers = [];
+        for (const oneChat of newChats) {
+            for (const userId of oneChat.users) {
+                if (auth.currentUser.uid !== userId) {
+                    const userRef = doc(firestore, "users", userId);
+                    const userSnap = await getDoc(userRef);
+                    newUsers.push(userSnap.data())
+                }
+            }
+            oneChat.users = newUsers;
+        }
+        setChatList(newChats)
+    }
+
     const hanldeSelectUser = (user) => {
         navigation.navigate("Message", {
             otherUser: user,
         })
     }
 
-    const renderUser = (user) => {
+    const renderUser = (chat) => {
         return (
-            <TouchableOpacity style={styles.userContainer} onPress={() => hanldeSelectUser(user)}>
+            <TouchableOpacity style={styles.userContainer} onPress={() => hanldeSelectUser(chat)}>
                 <View style={styles.avatarContainer}>
                     {
-                        user.avatar ?
-                            <Image style={styles.avatar} source={{ uri: user.avatar }} />
+                        chat.users[0].avatar ?
+                            <Image style={styles.avatar} source={{ uri: chat.users[0].avatar }} />
                             :
-                            <Ionicons style={styles.avatar} name="ios-person" size={136} />
+                            <Ionicons style={styles.avatar} name="ios-person" size={40} />
                     }
                 </View>
-                <Text style={styles.name}>{user.name}</Text>
+                <Text style={styles.name}>{chat.users[0].name}</Text>
             </TouchableOpacity>
         )
     }
@@ -83,7 +93,7 @@ export default UsersScreen = ({ navigation }) => {
                 style={styles.feed}
                 data={chatList}
                 renderItem={({ item }) => renderUser(item)}
-                keyExtractor={item => item.rid}
+                keyExtractor={item => item.id}
                 showsVerticalScrollIndicator={false}
             />
         </SafeAreaView>

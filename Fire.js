@@ -3,7 +3,6 @@ import { initializeApp } from "firebase/app";
 import { collection, getFirestore, addDoc, setDoc, doc } from "firebase/firestore";
 import { createUserWithEmailAndPassword, getAuth, signOut } from "firebase/auth";
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
-import { getDatabase } from "firebase/database";
 
 class Fire {
     constructor() {
@@ -12,8 +11,8 @@ class Fire {
 
     addPost = async ({ text, localUri }) => {
         const remoteUri = await this.uploadPhotoAsync(localUri, `photos/${this.uid}/${Date.now()}`);
-        
-        return new Promise( async (res, rej) => {
+
+        return new Promise(async (res, rej) => {
             try {
                 const ref = await addDoc(collection(this.firestore, "posts"), {
                     text,
@@ -26,12 +25,11 @@ class Fire {
                 return rej(err)
             }
 
-            
+
         })
     }
 
     uploadPhotoAsync = async (uri, filename) => {
-        // const path = `photos/${this.uid}/${Date.now()}.jpg`;
 
         return new Promise(async (res, rej) => {
             const response = await fetch(uri);
@@ -51,14 +49,11 @@ class Fire {
                         case 'paused':
                             console.log('Upload is paused');
                             break;
-                        case 'running':
-                            console.log('Upload is running');
-                            break;
                     }
                 },
                 (error) => {
                     rej(error);
-                }, 
+                },
                 async () => {
                     try {
                         const url = await getDownloadURL(uploadTask.snapshot.ref)
@@ -77,8 +72,7 @@ class Fire {
         let remoteUri = null;
 
         try {
-            const {email, avatar, password, name} = user;
-            console.log(user);
+            const { email, avatar, password, name } = user;
 
             const auth = getAuth();
             const createdUser = await createUserWithEmailAndPassword(auth, email, password);
@@ -91,10 +85,10 @@ class Fire {
                 avatar: null,
             });
 
-            if(avatar) {
+            if (avatar) {
                 remoteUri = await this.uploadPhotoAsync(user.avatar, `avatars/${this.uid}`)
 
-                setDoc(ref, { avatar: remoteUri}, {merge: true})
+                setDoc(ref, { avatar: remoteUri }, { merge: true })
             }
 
         } catch (err) {

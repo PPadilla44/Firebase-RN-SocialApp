@@ -1,14 +1,13 @@
 import React, { useEffect } from "react";
 import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import Fire from "../Fire";
 
 export default LoadingScreen = (props) => {
 
     const { navigation } = props;
+    const auth = getAuth();
 
     useEffect(() => {
-        const auth = getAuth();
         onAuthStateChanged(auth, (user) => {
             navigation.navigate(user ? "App" : "Auth")
         })
@@ -17,7 +16,7 @@ export default LoadingScreen = (props) => {
     return (
         <View style={styles.contatiner} >
             <Text>Loading...</Text>
-            <ActivityIndicator size={"large"}></ActivityIndicator>
+            <ActivityIndicator size={"large"} />
         </View>
     )
 }

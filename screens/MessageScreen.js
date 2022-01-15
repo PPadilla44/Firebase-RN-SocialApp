@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { GiftedChat } from 'react-native-gifted-chat'
 import Fire from "../Fire";
-import { doc, onSnapshot, collection, arrayUnion, setDoc, getFirestore, query, where, updateDoc, getDocs, addDoc, getDoc, orderBy, limit } from "firebase/firestore";
-import { View, StyleSheet } from "react-native";
+import { doc, onSnapshot, collection, arrayUnion, setDoc, getFirestore, query, where, updateDoc, getDocs, addDoc, orderBy } from "firebase/firestore";
+import { Text, StyleSheet, View } from "react-native";
 
 export default MessageScreen = ({ navigation }) => {
 
@@ -13,28 +13,30 @@ export default MessageScreen = ({ navigation }) => {
     const [chatId, setChatId] = useState("");
     const [loading, setLoading] = useState(true);
 
-    const fetchMessages = async () => {
+    const firestore = getFirestore();
 
-        console.log("FETCH");
-        let currentChatId = chatId;
-        if (currentChatId === "") {
-            currentChatId = await getChat();
+    const fetchMessages = async (currentChatId) => {
+
+        if(messages.length > 0) {
+            return [...messages];
         }
 
-        const messagesRef = collection(getFirestore(), "messages");
-        const messageQ = query(messagesRef, where('chatId', '==', currentChatId), orderBy("createdAt"));
+        const messagesRef = collection(firestore, "messages");
+        const messageQ = query(messagesRef, where('chatId', '==', currentChatId), orderBy("createdAt", "desc"));
         const messangeSnapshot = await getDocs(messageQ);
 
         if (messangeSnapshot.docs.length > 0) {
             let newMessages = [];
             messangeSnapshot.forEach((doc) => {
                 newMessages.push(doc.data())
-                console.log("messages", doc.id);
             });
             setMessages(newMessages)
+            setLoading(false);
+            return(newMessages)
 
         } else {
             console.log("no messages");
+            return([])
         }
     }
 
@@ -43,21 +45,20 @@ export default MessageScreen = ({ navigation }) => {
         if (chatId) {
             return chatId;
         }
-        const docRef = collection(getFirestore(), "chats");
+        const docRef = collection(firestore, "chats");
         const q = query(docRef, where('users', 'array-contains-any', [userId, otherUser._id]));
         const querySnapshot = await getDocs(q);
         if (querySnapshot.docs.length > 0) {
 
             let currentChatId;
             querySnapshot.forEach((doc) => {
-                console.log("CHATID", doc.id);
                 currentChatId = doc.id;
             });
 
             setChatId(currentChatId)
             return currentChatId;
         } else {
-            const newChat = await addDoc(collection(getFirestore(), "chats"), {
+            const newChat = await addDoc(collection(firestore, "chats"), {
                 users: [userId, otherUser._id],
                 messages: [],
                 createdAt: Date.now(),
@@ -71,38 +72,23 @@ export default MessageScreen = ({ navigation }) => {
     useEffect(async () => {
         const user = Fire.shared.uid;
 
-        const unsub = onSnapshot(doc(Fire.shared.firestore, "users", user), (doc) => {
+        const unsub = onSnapshot(doc(firestore, "users", user), (doc) => {
             setUser(doc.data());
             getChat(doc.data()._id);
-            fetchMessages();
         });
 
         return () => unsub();
     }, [])
 
     const updateMessages = async () => {
-        console.log("FETCH");
-        let currentChatId = chatId;
-        if (currentChatId === "") {
-            currentChatId = await getChat();
-        }
 
-        console.log("WORKING ", currentChatId);
-        const docRef = doc(getFirestore(), "chats", currentChatId);
+        let currentChatId = await getChat();
+        
+        const docRef = doc(firestore, "chats", currentChatId);
         const unsub = onSnapshot(docRef,
             async (snap) => {
-                console.log("NEWMNEASDF");
-                const chatData = snap.data();
-                const latestMessage = chatData.messages[chatData.messages.length - 1];
-                console.log(latestMessage);
-                const messageRef = doc(getFirestore(), "messages", latestMessage._id);
-                const docSnap = await getDoc(messageRef);
-                if (docSnap.exists()) {
-                    console.log("Document data:", docSnap.data());
-                } else {
-                    // doc.data() will be undefined in this case
-                    console.log("No such document!");
-                }
+                // NEW MESSAGE
+                await fetchMessages(currentChatId);
             },
             (err) => {
                 console.log(err);
@@ -114,38 +100,39 @@ export default MessageScreen = ({ navigation }) => {
     }
 
     useEffect(async () => {
-        console.log("**************REAL TEIM");
         updateMessages();
     }, []);
 
     const onSend = async (messages = []) => {
-        const chatRef = doc(getFirestore(), "chats", chatId)
+        const chatRef = doc(firestore, "chats", chatId)
 
-        const newMessage = await addDoc(collection(getFirestore(), "messages"), {
+        const newMessage = await addDoc(collection(firestore, "messages"), {
             user,
             text: messages[0].text,
             chatId,
             createdAt: Date.now()
         });
 
-        const messageRef = doc(getFirestore(), "messages", newMessage.id)
+        const messageRef = doc(firestore, "messages", newMessage.id)
         await setDoc(messageRef, { _id: messageRef.id }, { merge: true })
 
         const messageData = {
             _id: messageRef.id,
         };
 
-
-        // Atomically add a new region to the "regions" array field.
         await updateDoc(chatRef, {
             messages: arrayUnion(messageData)
         });
-
 
         setMessages(previousMessages => GiftedChat.append(previousMessages, messages))
     }
 
     return (
+        loading ?
+        <View style={styles.container}>
+            <Text>Loading...</Text>
+        </View>
+        :
         <GiftedChat
             messages={messages}
             onSend={messages => onSend(messages)}
